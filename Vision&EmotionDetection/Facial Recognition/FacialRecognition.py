@@ -90,7 +90,7 @@ while True:
 
                     # Take a screenshot
                     screenshot_path = os.path.join(
-                        screenshot_dir, f"{name}_screenshot.jpg"
+                        screenshot_dir, f"{name}.jpg"
                     )
                     cv2.imwrite(screenshot_path, frame)
                     print(f"Screenshot saved as {screenshot_path}")
