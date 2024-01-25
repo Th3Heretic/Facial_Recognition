@@ -13,11 +13,11 @@ emotion_model = load_model("fer2013_mini_XCEPTION.107-0.66.hdf5")
 # Define emotion labels
 emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
 
-# Directory to save screenshots
-screenshot_dir = "screenshots"
+# Directory to save facial data
+faces_dir = "faces"
 
 # Create the directory if it doesn't exist
-os.makedirs(screenshot_dir, exist_ok=True)
+os.makedirs(faces_dir, exist_ok=True)
 
 # Open a connection to the camera (0 for default camera)
 cap = cv2.VideoCapture(0)
@@ -55,10 +55,10 @@ while True:
                 # Draw rectangle around the face
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-                # Check if the detected face matches any face in the screenshots directory
+                # Check if the detected face matches any face in the face data directory
                 matches = []
-                for filename in os.listdir(screenshot_dir):
-                    screenshot_path = os.path.join(screenshot_dir, filename)
+                for filename in os.listdir(faces_dir):
+                    screenshot_path = os.path.join(faces_dir, filename)
 
                     # Check if a face is detected before attempting to extract encoding
                     try:
@@ -89,11 +89,11 @@ while True:
                     name = input("What's your name? ")
 
                     # Take a screenshot
-                    screenshot_path = os.path.join(
-                        screenshot_dir, f"{name}.jpg"
+                    faces_path = os.path.join(
+                        faces_dir, f"{name}.jpg"
                     )
-                    cv2.imwrite(screenshot_path, frame)
-                    print(f"Screenshot saved as {screenshot_path}")
+                    cv2.imwrite(faces_path, frame)
+                    print(f"Face data saved as {faces_path}")
 
         # Display the resulting frame
         cv2.imshow("Facial Recognition", frame)
