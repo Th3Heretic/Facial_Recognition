@@ -1,26 +1,55 @@
 import cv2
 import numpy as np
 import dlib
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model, save_model, Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 import face_recognition
 import os
+
+def create_and_compile_emotion_model():
+    model = Sequential()
+
+    # Convolutional layers
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(64, 64, 1)))
+    model.add(MaxPooling2D((2, 2)))
+    model.add(Conv2D(64, (3, 3), activation='relu'))
+    model.add(MaxPooling2D((2, 2)))
+    model.add(Conv2D(128, (3, 3), activation='relu'))
+    model.add(MaxPooling2D((2, 2)))
+
+    # Flatten layer and fully connected layers
+    model.add(Flatten())
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(7, activation='softmax'))  # Assuming 7 emotion classes
+
+    # Compile the model
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+    return model
 
 # Load pre-trained models
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
-emotion_model = load_model("fer2013_mini_XCEPTION.107-0.66.hdf5")
 
 # Define emotion labels
 emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
 
-# Directory to save facial data
-faces_dir = "faces"
+# Directory to save screenshots
+faces_dir = "Faces"
 
 # Create the directory if it doesn't exist
 os.makedirs(faces_dir, exist_ok=True)
 
 # Open a connection to the camera (0 for default camera)
 cap = cv2.VideoCapture(0)
+
+# Check if the model file exists, and load the model accordingly
+model_filename = "emotion_model.h5"
+if os.path.exists(model_filename):
+    emotion_model = load_model(model_filename)
+else:
+    # If the model file doesn't exist, create and compile a new model
+    emotion_model = create_and_compile_emotion_model()  # You need to implement this function
 
 while True:
     try:
@@ -55,7 +84,7 @@ while True:
                 # Draw rectangle around the face
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-                # Check if the detected face matches any face in the face data directory
+                # Check if the detected face matches any face in the screenshots directory
                 matches = []
                 for filename in os.listdir(faces_dir):
                     screenshot_path = os.path.join(faces_dir, filename)
@@ -74,16 +103,21 @@ while True:
                     match = face_recognition.compare_faces(
                         [known_face_encoding], current_face_encoding
                     )[0]
-                    matches.append(match)
+                    matches.append((match, filename))
 
                 if any(matches):
-                    cv2.putText(frame, "Hello, friend - "+emotion_label,
+                    matched_name = [name for match, name in matches if match][0]
+                    cv2.putText(
+                        frame,
+                        f"{os.path.splitext(matched_name.split('_')[0])[0]} - " + emotion_label,
+                        # Extracting name from filename
                         (x, y - 30),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.9,
                         (0, 255, 0),
                         2,
                     )
+
                 else:
                     # Ask for the name
                     name = input("What's your name? ")
@@ -93,7 +127,7 @@ while True:
                         faces_dir, f"{name}.jpg"
                     )
                     cv2.imwrite(faces_path, frame)
-                    print(f"Face data saved as {faces_path}")
+                    print(f"Screenshot saved as {faces_path}")
 
         # Display the resulting frame
         cv2.imshow("Facial Recognition", frame)
@@ -104,6 +138,9 @@ while True:
     except Exception as e:
         print(f"Error: {e}")
         break
+
+# Save the entire model (architecture, optimizer, and weights)
+save_model(emotion_model, model_filename)
 
 # Release the camera and close all OpenCV windows
 cap.release()
