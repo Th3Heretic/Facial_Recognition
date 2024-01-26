@@ -13,3 +13,5 @@ A corresponding emotion will also be displayed next to your name separated with 
 
 The Python file named 'EmotionDetection.py' is just a basic program to detect and display the determined facial 
 expression without the name identifier and as such, has no saved model file implemented into it.
+
+[Full commit history unavailable as the GitHub repository was only created as an afterthought to share the code with friends]
