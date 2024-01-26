@@ -21,7 +21,7 @@ def create_and_compile_emotion_model():
     # Flatten layer and fully connected layers
     model.add(Flatten())
     model.add(Dense(128, activation='relu'))
-    model.add(Dense(7, activation='softmax'))  # Assuming 7 emotion classes
+    model.add(Dense(7, activation='softmax'))
 
     # Compile the model
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -51,7 +51,7 @@ if os.path.exists(model_filename):
     emotion_model = load_model(model_filename)
 else:
     # If the model file doesn't exist, create and compile a new model
-    emotion_model = create_and_compile_emotion_model()  # You need to implement this function
+    emotion_model = create_and_compile_emotion_model()
 
 while True:
     try:
@@ -133,7 +133,7 @@ while True:
 
         # Display the resulting frame
         cv2.imshow("Facial Recognition", frame)
-
+        # Use 'q' to quit the program
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
