@@ -10,7 +10,7 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # Load pre-trained emotion recognition model
-emotion_model = load_model("fer2013_mini_XCEPTION.107-0.66.hdf5")
+emotion_model = load_model("fer2013_mini_XCEPTION.107-0.66.keras")
 
 # Define emotion labels
 emotion_labels = ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']

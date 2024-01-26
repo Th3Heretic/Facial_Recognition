@@ -6,6 +6,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 import face_recognition
 import os
 
+
 def create_and_compile_emotion_model():
     model = Sequential()
 
@@ -27,6 +28,7 @@ def create_and_compile_emotion_model():
 
     return model
 
+
 # Load pre-trained models
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
@@ -44,7 +46,7 @@ os.makedirs(faces_dir, exist_ok=True)
 cap = cv2.VideoCapture(0)
 
 # Check if the model file exists, and load the model accordingly
-model_filename = "emotion_model.h5"
+model_filename = "emotion_model.keras"
 if os.path.exists(model_filename):
     emotion_model = load_model(model_filename)
 else:
@@ -140,7 +142,7 @@ while True:
         break
 
 # Save the entire model (architecture, optimizer, and weights)
-save_model(emotion_model, model_filename)
+save_model(emotion_model, model_filename) + '.keras'
 
 # Release the camera and close all OpenCV windows
 cap.release()
