@@ -1,4 +1,4 @@
-The following modules will need to be installed in the terminal in order for the programs to work:
+The following modules will need to be installed in the terminal in order for the "FacialRecognition" programs to work:
 
 >pip install face_recognition numpy opencv-python dlib imutils tensorflow emotion_recognition
 
