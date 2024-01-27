@@ -15,3 +15,8 @@ The Python file named 'EmotionDetection.py' is just a basic program to detect an
 expression without the name identifier and as such, has no saved model file implemented into it.
 
 [Full commit history unavailable as the GitHub repository was only created as an afterthought to share the code with friends]
+
+Known Issues:
+Returns a list index error when encountered with a new face.
+    Fix (for now): Manually add a photo of your face named as [Your_Name].jpg (This will need to be done for each new 
+    person you intend to use this with) 

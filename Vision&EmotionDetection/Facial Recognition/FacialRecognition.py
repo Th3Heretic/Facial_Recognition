@@ -89,15 +89,27 @@ while True:
                 # Check if the detected face matches any face in the screenshots directory
                 matches = []
                 for filename in os.listdir(faces_dir):
-                    screenshot_path = os.path.join(faces_dir, filename)
+                    faces_path = os.path.join(faces_dir, filename)
 
                     # Check if a face is detected before attempting to extract encoding
                     try:
-                        known_face_encoding = face_recognition.face_encodings(
-                            face_recognition.load_image_file(screenshot_path)
-                        )[0]
+                        face_encodings = face_recognition.face_encodings(
+                            face_recognition.load_image_file(faces_path)
+                        )
+                        if not face_encodings:
+                            print(f"No face found in {faces_path}. Skipping.")
+                            continue  # Skip to the next image if no face is found
+
+                        # Only take the first face encoding if there are multiple faces
+                        known_face_encoding = face_encodings[0]
+
                     except IndexError:
-                        continue  # Skip to the next image if no face is found
+                        print(f"IndexError: No face encoding found in {faces_path}. Skipping.")
+                        continue  # Skip to the next image if no face encoding is found
+
+                    except Exception as e:
+                        print(f"Error processing {faces_path}: {e}")
+                        continue  # Skip to the next image in case of other exceptions
 
                     current_face_encoding = face_recognition.face_encodings(
                         frame, [(y, x + w, y + h, x)]
@@ -142,7 +154,7 @@ while True:
         break
 
 # Save the entire model (architecture, optimizer, and weights)
-save_model(emotion_model, model_filename) + '.keras'
+save_model(emotion_model, model_filename + '.keras')
 
 # Release the camera and close all OpenCV windows
 cap.release()
