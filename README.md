@@ -18,5 +18,4 @@ expression without the name identifier and as such, has no saved model file impl
 
 Known Issues:
 Returns a list index error when encountered with a new face.
-    Fix (for now): Manually add a photo of your face named as [Your_Name].jpg (This will need to be done for each new 
-    person you intend to use this with) 
+    Fix: Returns 'Unknown' above the target instead of asking for their name.
