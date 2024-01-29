@@ -132,13 +132,21 @@ while True:
                         2,
                     )
 
-                else:
-                    # Ask for the name
-                    name = input("What's your name? ")
 
-                    # Take a screenshot
+                else:
+                    # Display 'unknown'
+                    cv2.putText(
+                        frame,
+                        "Unknown - " + emotion_label,
+                        (x, y - 30),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.9,
+                        (0, 255, 0),
+                        2,
+                    )
+                    # Save the image with a generic filename
                     faces_path = os.path.join(
-                        faces_dir, f"{name}.jpg"
+                        faces_dir, "unknown.jpg"
                     )
                     cv2.imwrite(faces_path, frame)
                     print(f"Screenshot saved as {faces_path}")
@@ -154,7 +162,7 @@ while True:
         break
 
 # Save the entire model (architecture, optimizer, and weights)
-save_model(emotion_model, model_filename + '.keras')
+save_model(emotion_model, model_filename)
 
 # Release the camera and close all OpenCV windows
 cap.release()
