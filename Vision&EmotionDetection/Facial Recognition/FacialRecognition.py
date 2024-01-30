@@ -18,6 +18,7 @@ cap = cv2.VideoCapture(0)
 
 # Load pre-trained face detector
 detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 # Create a log file
 log_file_path = os.path.join(logs_dir, "face_detection_log.txt")
