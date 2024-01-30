@@ -60,6 +60,12 @@ def detect_and_recognize_faces_camera():
                 # Put the name above the detected face
                 cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
 
+                # Take a screenshot if an unknown face is detected
+                if name == "Unknown":
+                    screenshot_name = f"unknown_face_{int(time.time())}.jpg"
+                    cv2.imwrite(screenshot_name, frame)
+                    print(f"Unknown face detected! Screenshot saved as {screenshot_name}")
+
             # Display the frame with detected and recognized faces
             cv2.imshow('Detected and Recognized Faces', frame)
 
