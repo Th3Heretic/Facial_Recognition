@@ -1,6 +1,7 @@
 import cv2
 import face_recognition
 import os
+import datetime
 
 # Load the pre-trained face detection model from OpenCV
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -62,7 +63,8 @@ def detect_and_recognize_faces_camera():
 
                 # Take a screenshot if an unknown face is detected
                 if name == "Unknown":
-                    screenshot_name = f"unknown_face_{int(time.time())}.jpg"
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                    screenshot_name = f"unknown_face_{timestamp}.jpg"
                     cv2.imwrite(screenshot_name, frame)
                     print(f"Unknown face detected! Screenshot saved as {screenshot_name}")
 
