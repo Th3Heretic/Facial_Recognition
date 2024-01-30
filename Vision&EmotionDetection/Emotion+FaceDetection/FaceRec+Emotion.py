@@ -5,6 +5,8 @@ from tensorflow.keras.models import load_model, save_model, Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 import face_recognition
 import os
+from datetime import datetime
+
 
 
 def create_and_compile_emotion_model():
@@ -37,7 +39,7 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 emotion_labels = ['Angry', 'Disgusted', 'Fearful', 'Happy', 'Sad', 'Surprised', 'Neutral']
 
 # Directory to save screenshots
-faces_dir = "Faces"
+faces_dir = "../Facial Recognition/Faces"
 
 # Create the directory if it doesn't exist
 os.makedirs(faces_dir, exist_ok=True)
@@ -132,21 +134,23 @@ while True:
                         2,
                     )
 
-
                 else:
-                    # Display 'unknown'
+                    # Display 'unknown' with date and time stamp
+                    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                    unknown_label = f"Unknown_{current_time}"
                     cv2.putText(
                         frame,
-                        "Unknown - " + emotion_label,
+                        f"{unknown_label} - {emotion_label}",
                         (x, y - 30),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.9,
                         (0, 255, 0),
                         2,
                     )
-                    # Save the image with a generic filename
+
+                    # Save the image with a filename including date and time stamp
                     faces_path = os.path.join(
-                        faces_dir, "unknown.jpg"
+                        faces_dir, f"{unknown_label}.jpg"
                     )
                     cv2.imwrite(faces_path, frame)
                     print(f"Screenshot saved as {faces_path}")
