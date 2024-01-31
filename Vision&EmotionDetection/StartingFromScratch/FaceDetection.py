@@ -3,6 +3,10 @@ import dlib
 import datetime
 import os
 import face_recognition
+import logging
+
+# Set up logging
+logging.basicConfig(filename='data/face_detection_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 # Load the pre-trained face detection model from dlib
 detector = dlib.get_frontal_face_detector()
@@ -62,6 +66,10 @@ def detect_and_recognize_faces_camera():
                     if True in matches:
                         first_match_index = matches.index(True)
                         name = known_face_names[first_match_index]
+
+                    # Log information about the detected face
+                    log_info = f"Face detected - Name: {name}, Timestamp: {datetime.datetime.now()}"
+                    logging.info(log_info)
 
                     # Draw rectangles around the detected faces
                     cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
