@@ -11,8 +11,9 @@ logging.basicConfig(filename='data/face_detection_log.txt', level=logging.INFO, 
 # Load the pre-trained face detection model from dlib
 detector = dlib.get_frontal_face_detector()
 
+
 # Function to detect and recognize faces in real-time using the camera
-def detect_and_recognize_faces_camera():
+def detect_and_recognize():
     try:
         # Open a connection to the camera (0 represents the default camera)
         cap = cv2.VideoCapture(0)
@@ -20,12 +21,15 @@ def detect_and_recognize_faces_camera():
         # Load images and corresponding names for face recognition
         known_face_encodings = []
         known_face_names = []
+        face_detected = {}  # Dictionary to track the state of each known face
+        unknown_faces_screenshot_taken = set()  # Set to track unknown faces for which a screenshot has been taken
 
         # Load known faces from the 'data/faces' directory
         for filename in os.listdir('data/faces'):
             if filename.endswith(".jpg"):
                 name = os.path.splitext(filename)[0]  # Extract the name from the file name
                 known_face_names.append(name)
+                face_detected[name] = False  # Initialize as not detected
 
                 image = face_recognition.load_image_file(f"data/faces/{filename}")
                 encoding = face_recognition.face_encodings(image)[0]
@@ -67,22 +71,31 @@ def detect_and_recognize_faces_camera():
                         first_match_index = matches.index(True)
                         name = known_face_names[first_match_index]
 
-                    # Log information about the detected face
-                    log_info = f"Face detected - Name: {name}, Timestamp: {datetime.datetime.now()}"
-                    logging.info(log_info)
+                        # If the face was not detected in the previous frame, create a log entry
+                        if not face_detected.get(name, False):
+                            log_info = f"Face detected - Name: {name}, Timestamp: {datetime.datetime.now()}"
+                            logging.info(log_info)
+                            face_detected[name] = True  # Update state to detected
+                    else:
+                        # If the face was detected in the previous frame, create a log entry
+                        if face_detected.get(name, False):
+                            log_info = f"Face lost - Name: {name}, Timestamp: {datetime.datetime.now()}"
+                            logging.info(log_info)
+                            face_detected[name] = False  # Update state to not detected
+
+                            # Check if a screenshot has already been taken for this unknown face
+                            if name == 'Unknown' and name not in unknown_faces_screenshot_taken:
+                                timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                                screenshot_name = f"data/faces/unknown_face_{timestamp}.jpg"
+                                cv2.imwrite(screenshot_name, frame)
+                                print(f"Unknown face detected! Screenshot saved as {screenshot_name}")
+                                unknown_faces_screenshot_taken.add(name)
 
                     # Draw rectangles around the detected faces
                     cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
 
                     # Put the name above the detected face
                     cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 0), 2)
-
-                    # Take a screenshot if an unknown face is detected
-                    if name == "Unknown":
-                        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-                        screenshot_name = f"data/faces/unknown_face_{timestamp}.jpg"
-                        cv2.imwrite(screenshot_name, frame)
-                        print(f"Unknown face detected! Screenshot saved as {screenshot_name}")
                 else:
                     print("No face encodings found for the detected face.")
 
@@ -100,5 +113,6 @@ def detect_and_recognize_faces_camera():
     except Exception as e:
         print(f"Error: {e}")
 
+
 # Call the function for real-time face detection and recognition
-detect_and_recognize_faces_camera()
+detect_and_recognize()
