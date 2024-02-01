@@ -11,7 +11,6 @@ logging.basicConfig(filename='data/face_detection_log.txt', level=logging.INFO, 
 # Load the pre-trained face detection model from dlib
 detector = dlib.get_frontal_face_detector()
 
-
 # Function to detect and recognize faces in real-time using the camera
 def detect_and_recognize():
     try:
@@ -23,6 +22,7 @@ def detect_and_recognize():
         known_face_names = []
         face_detected = {}  # Dictionary to track the state of each known face
         unknown_faces_screenshot_taken = set()  # Set to track unknown faces for which a screenshot has been taken
+        unknown_faces_video_recording = {}  # Dictionary to track video recording for each unique unknown face
 
         # Load known faces from the 'data/faces' directory
         for filename in os.listdir('data/faces'):
@@ -76,20 +76,36 @@ def detect_and_recognize():
                             log_info = f"Face detected - Name: {name}, Timestamp: {datetime.datetime.now()}"
                             logging.info(log_info)
                             face_detected[name] = True  # Update state to detected
-                    else:
-                        # If the face was detected in the previous frame, create a log entry
-                        if face_detected.get(name, False):
-                            log_info = f"Face lost - Name: {name}, Timestamp: {datetime.datetime.now()}"
-                            logging.info(log_info)
-                            face_detected[name] = False  # Update state to not detected
+                            unknown_faces_screenshot_taken.discard(name)  # Reset screenshot status for this face
 
-                            # Check if a screenshot has already been taken for this unknown face
-                            if name == 'Unknown' and name not in unknown_faces_screenshot_taken:
+                            # Take a screenshot for this unique unknown face
+                            if name not in unknown_faces_screenshot_taken:
                                 timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
                                 screenshot_name = f"data/faces/unknown_face_{timestamp}.jpg"
                                 cv2.imwrite(screenshot_name, frame)
                                 print(f"Unknown face detected! Screenshot saved as {screenshot_name}")
                                 unknown_faces_screenshot_taken.add(name)
+
+                            # Start video recording for this unique unknown face
+                            if name not in unknown_faces_video_recording:
+                                video_directory = f"data/unknown_face_video/{name}_{timestamp}/"
+                                os.makedirs(video_directory, exist_ok=True)
+                                video_filename = f"{video_directory}unknown_face_{timestamp}.mp4"
+                                video_writer = cv2.VideoWriter(video_filename, cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (640, 480))
+                                unknown_faces_video_recording[name] = video_writer
+                                print(f"Video recording started for {name}. Saving to {video_filename}")
+
+                    # If the face was detected in the previous frame, create a log entry
+                    elif face_detected.get(name, False):
+                        log_info = f"Face lost - Name: {name}, Timestamp: {datetime.datetime.now()}"
+                        logging.info(log_info)
+                        face_detected[name] = False  # Update state to not detected
+
+                        # Stop video recording for this unique unknown face
+                        if name in unknown_faces_video_recording:
+                            unknown_faces_video_recording[name].release()
+                            del unknown_faces_video_recording[name]
+                            print(f"Video recording stopped for {name}")
 
                     # Draw rectangles around the detected faces
                     cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
@@ -112,7 +128,6 @@ def detect_and_recognize():
 
     except Exception as e:
         print(f"Error: {e}")
-
 
 # Call the function for real-time face detection and recognition
 detect_and_recognize()
