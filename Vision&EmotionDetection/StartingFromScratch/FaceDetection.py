@@ -11,6 +11,7 @@ logging.basicConfig(filename='data/face_detection_log.txt', level=logging.INFO, 
 # Load the pre-trained face detection model from dlib
 detector = dlib.get_frontal_face_detector()
 
+
 # Function to detect and recognize faces in real-time using the camera
 def detect_and_recognize():
     try:
@@ -87,7 +88,7 @@ def detect_and_recognize():
                                 unknown_faces_screenshot_taken.add(name)
 
                             # Start video recording for this unique unknown face
-                            if name not in unknown_faces_video_recording:
+                            if name not in known_face_names and name not in unknown_faces_video_recording:
                                 video_directory = f"data/unknown_face_video/{name}_{timestamp}/"
                                 os.makedirs(video_directory, exist_ok=True)
                                 video_filename = f"{video_directory}unknown_face_{timestamp}.mp4"
@@ -128,6 +129,7 @@ def detect_and_recognize():
 
     except Exception as e:
         print(f"Error: {e}")
+
 
 # Call the function for real-time face detection and recognition
 detect_and_recognize()
