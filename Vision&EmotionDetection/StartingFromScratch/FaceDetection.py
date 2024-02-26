@@ -6,7 +6,7 @@ import face_recognition
 import logging
 
 # Set up logging
-logging.basicConfig(filename='data/face_detection_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
+logging.basicConfig(filename='data/logs/face_detection_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 # Load the pre-trained face detection model from dlib
 detector = dlib.get_frontal_face_detector()
@@ -96,7 +96,7 @@ def detect_and_recognize():
                                 unknown_faces_video_recording[name] = video_writer
                                 print(f"Video recording started for {name}. Saving to {video_filename}")
 
-                    # If the face was detected in the previous frame, create a log entry
+                    # If the face was detected in the previous frame, but not the current one, create a log entry
                     elif face_detected.get(name, False):
                         log_info = f"Face lost - Name: {name}, Timestamp: {datetime.datetime.now()}"
                         logging.info(log_info)
